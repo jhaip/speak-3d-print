@@ -1,0 +1,5 @@
+.env
+myenv
+*.stl
+.DS_Store
+*.wav

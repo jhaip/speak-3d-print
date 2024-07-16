@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice to STL Model</title>
+</head>
+<body>
+    <h1>Voice to STL Model</h1>
+    <button id="record-btn">Start Recording</button>
+    <p id="status"></p>
+    <a id="download-link" href="#" download style="display: none;">Download Model</a>
+    <div id="renderer-container" style="display: none;"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let recording = false;
+        let scene, camera, renderer, loader, controls;
+
+        window.onload = function () {
+            navigator.permissions.query({name: 'microphone'})
+            .then((permissionObj) => {
+                console.log(permissionObj.state);
+            })
+            .catch((error) => {
+                console.log('Got error :', error);
+            });
+        };
+
+        document.getElementById('record-btn').addEventListener('click', () => {
+            if (recording) {
+                mediaRecorder.stop();
+                document.getElementById('record-btn').innerText = "Start Recording";
+                document.getElementById('status').innerText = "Processing...";
+                recording = false;
+            } else {
+                startRecording();
+            }
+        });
+
+        function startRecording() {
+            console.log("requesting microphone access...")
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    console.log("microphone access granted.")
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.ondataavailable = event => {
+                        audioChunks.push(event.data);
+                    };
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const formData = new FormData();
+                        formData.append('audio', audioBlob, 'recording.wav');
+                        
+                        fetch('/record', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('status').innerText = data.message;
+                            if (data.message.includes('error')) {
+                                return;
+                            }
+                            document.getElementById('download-link').href = `/download/${data.file_path}`;
+                            document.getElementById('download-link').style.display = 'block';
+                            document.getElementById('renderer-container').style.display = 'block';
+                            playAudio(data.message);
+                            renderSTL(`/download/${data.file_path}`);
+                        });
+                    };
+                    mediaRecorder.start();
+                    document.getElementById('record-btn').innerText = "Stop Recording";
+                    document.getElementById('status').innerText = "Recording...";
+                    audioChunks = [];
+                    recording = true;
+                })
+                .catch(error => {
+                    console.error('Error accessing microphone:', error);
+                    document.getElementById('status').innerText = "Microphone access denied.";
+                });
+        }
+
+        function playAudio(text) {
+            const msg = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(msg);
+        }
+
+        function initThreeJS() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xffffff);
+
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / 500, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, 500);
+            document.getElementById('renderer-container').appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0x404040); // Soft white light
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(1, 1, 1).normalize();
+            scene.add(directionalLight);
+
+            const gridHelper = new THREE.GridHelper(10, 20);
+            scene.add(gridHelper);
+
+            loader = new THREE.STLLoader();
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+        }
+
+        function renderSTL(url) {
+            loader.load(url, geometry => {
+                const material = new THREE.MeshStandardMaterial({ color: 0x606060, roughness: 0.75, metalness: 0.1 });
+                const mesh = new THREE.Mesh(geometry, material);
+                scene.add(mesh);
+
+                // Compute the bounding box of the geometry to dynamically adjust the camera
+                const boundingBox = new THREE.Box3().setFromObject(mesh);
+                const center = boundingBox.getCenter(new THREE.Vector3());
+                const size = boundingBox.getSize(new THREE.Vector3());
+
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const fov = camera.fov * (Math.PI / 180);
+                let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+
+                cameraZ *= 2; // Ensure we can see the whole object
+
+                camera.position.set(center.x, center.y, cameraZ);
+                camera.lookAt(center);
+
+                controls.target.set(center.x, center.y, center.z);
+                controls.update();
+
+                animate();
+            });
+        }
+
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        initThreeJS();
+    </script>
+</body>
+</html>
