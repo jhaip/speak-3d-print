@@ -63,15 +63,31 @@
                         })
                         .then(response => response.json())
                         .then(data => {
-                            document.getElementById('status').innerText = data.message;
+                            document.getElementById('status').innerText = data.text;
                             if (data.message.includes('error')) {
                                 return;
                             }
-                            document.getElementById('download-link').href = `/download/${data.file_path}`;
-                            document.getElementById('download-link').style.display = 'block';
-                            document.getElementById('renderer-container').style.display = 'block';
-                            playAudio(data.message);
-                            renderSTL(`/download/${data.file_path}`);
+
+                            const jsonData = {"prompt": data.text};
+                            fetch('/make-model', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(jsonData)
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                document.getElementById('status').innerText = data.message;
+                                if (data.message.includes('error')) {
+                                    return;
+                                }
+                                document.getElementById('download-link').href = `/download/${data.file_path}`;
+                                document.getElementById('download-link').style.display = 'block';
+                                document.getElementById('renderer-container').style.display = 'block';
+                                playAudio(data.message);
+                                renderSTL(`/download/${data.file_path}`);
+                            });
                         });
                     };
                     mediaRecorder.start();

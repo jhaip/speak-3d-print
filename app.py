@@ -14,6 +14,10 @@ from enum import Enum
 from pathlib import Path
 from urllib.request import Request, urlopen
 
+import formlabs
+import openapi_client
+from openapi_client.models.auto_orient_post_request import AutoOrientPostRequest
+
 app = Flask(__name__)
 CORS(app)
 
@@ -101,6 +105,39 @@ def text_to_3d_model(prompt: str) -> Path | str:
     # mock by returning a locally saved .stl file
     # return Path("test.stl")
 
+def convert_3d_model_to_printable_model(stl_file_path: Path) -> Path | str:
+    print(f"Converting 3D model to printable model...")
+    with formlabs.PreFormApi.start_preform_server() as preform:
+        print(f"Creating new scene...")
+        preform.api.scene_post({
+            "machine_type": "FRMB-3-0",
+            "material_code": "FLGPBK04",
+            "slice_thickness": 0.1,
+            "print_setting": "LEGACY",
+        })
+        print(f"Importing model...")
+        new_model = preform.api.import_model_post(str(stl_file_path))
+        new_model_id = new_model.model_id
+        print(f"Auto orienting...")
+        preform.api.auto_orient_post(AutoOrientPostRequest.from_dict({"models": "ALL"}))
+        print(f"Auto supporting...")
+        preform.api.auto_support_post(AutoOrientPostRequest.from_dict({"models": "ALL"}))
+        print(f"Auto layout...")
+        preform.api.auto_layout_post_with_http_info(
+            AutoOrientPostRequest.from_dict({"models": "ALL"})
+        )
+
+        # TODO: probably replace .STL export with a thumbnail image
+        print(f"Exporting model as .STL")
+        exported_stl_path = Path("export.stl")
+        preform.api.export_post(str(exported_stl_path))
+        print(f"Exported STL file to {exported_stl_path}")
+
+        exported_form_path = Path("export.form")
+        preform.api.save_form_post(str(exported_form_path))
+        print(f"Exported .form file to {exported_form_path}")
+        return exported_stl_path
+
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
@@ -113,12 +150,28 @@ def record():
 
     transcribed_text = transcribe(audio_path)
     print(f"Transcribed text: {transcribed_text}")
-    stl_file_path = text_to_3d_model(transcribed_text)
+    return jsonify({"text":transcribed_text})
+
+@app.route('/make-model', methods=['POST'])
+def record():
+    prompt = request.json['prompt']
+    stl_file_path = text_to_3d_model(prompt)
     print(f"STL file path: {stl_file_path}")
     if isinstance(stl_file_path, str):
         return jsonify({"message": "Error", "error": stl_file_path})
-    
     return jsonify({"message": "Model is ready", "file_path": stl_file_path.name})
+
+@app.route('/make-printable-model', methods=['POST'])
+def record():
+    stl_file_path = request.json['file_path']
+
+    # using Preform API to do OCP and save the result as an .STL and a .form
+    # return the path to the .stl and the .form
+    result = convert_3d_model_to_printable_model(stl_file_path)
+    print(f"Printable model result: {result}")
+    if isinstance(result, str):
+        return jsonify({"message": "Error", "error": result})
+    return jsonify({"message": "Printable model is ready", "file_path": result.name})
 
 @app.route('/download/<filename>')
 def download_file(filename):
