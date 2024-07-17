@@ -14,7 +14,7 @@ from enum import Enum
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-import formlabs
+import pythonlib.formlabs.formlabs as formlabs
 import openapi_client
 from openapi_client.models.auto_orient_post_request import AutoOrientPostRequest
 
@@ -107,36 +107,42 @@ def text_to_3d_model(prompt: str) -> Path | str:
 
 def convert_3d_model_to_printable_model(stl_file_path: Path) -> Path | str:
     print(f"Converting 3D model to printable model...")
-    with formlabs.PreFormApi.start_preform_server() as preform:
-        print(f"Creating new scene...")
-        preform.api.scene_post({
-            "machine_type": "FRMB-3-0",
-            "material_code": "FLGPBK04",
-            "slice_thickness": 0.1,
-            "print_setting": "LEGACY",
-        })
-        print(f"Importing model...")
-        new_model = preform.api.import_model_post(str(stl_file_path))
-        new_model_id = new_model.model_id
-        print(f"Auto orienting...")
-        preform.api.auto_orient_post(AutoOrientPostRequest.from_dict({"models": "ALL"}))
-        print(f"Auto supporting...")
-        preform.api.auto_support_post(AutoOrientPostRequest.from_dict({"models": "ALL"}))
-        print(f"Auto layout...")
-        preform.api.auto_layout_post_with_http_info(
-            AutoOrientPostRequest.from_dict({"models": "ALL"})
-        )
+    try:
+        p = Path.home() / "code/build-PreForm-Desktop_Qt_5_15_2_clang_64bit-Debug/app/PreFormServer/output/PreFormServer.app/Contents/MacOS/PreFormServer"
+        with formlabs.PreFormApi.start_preform_server(pathToPreformServer=p) as preform:
+            print(f"Creating new scene...")
+            preform.api.scene_post({
+                "machine_type": "FRMB-3-0",
+                "material_code": "FLGPBK04",
+                "slice_thickness": 0.1,
+                "print_setting": "LEGACY",
+            })
+            print(f"Importing model... {str(stl_file_path.resolve())}")
+            # zoo.dev seems to produce models that are very small (unit scale)? so scale them up a bunch
+            scale = 1000
+            new_model = preform.api.scene_import_model_post({"file": str(stl_file_path.resolve()), "scale": scale})
+            new_model_id = new_model.model_id
+            print(f"Auto orienting...")
+            preform.api.auto_orient_post(AutoOrientPostRequest.from_dict({"models": "ALL"}))
+            print(f"Auto supporting...")
+            preform.api.auto_support_post(AutoOrientPostRequest.from_dict({"models": "ALL"}))
+            # print(f"Auto layout...")
+            # preform.api.auto_layout_post_with_http_info(
+            #     AutoOrientPostRequest.from_dict({"models": "ALL"})
+            # )
 
-        # TODO: probably replace .STL export with a thumbnail image
-        print(f"Exporting model as .STL")
-        exported_stl_path = Path("export.stl")
-        preform.api.export_post(str(exported_stl_path))
-        print(f"Exported STL file to {exported_stl_path}")
+            # TODO: probably replace .STL export with a thumbnail image
+            print(f"Exporting model as .STL")
+            exported_stl_path = Path("export.stl")
+            preform.api.export_post(str(exported_stl_path))
+            print(f"Exported STL file to {exported_stl_path}")
 
-        exported_form_path = Path("export.form")
-        preform.api.save_form_post(str(exported_form_path))
-        print(f"Exported .form file to {exported_form_path}")
-        return exported_stl_path
+            exported_form_path = Path("export.form")
+            preform.api.save_form_post(str(exported_form_path))
+            print(f"Exported .form file to {exported_form_path}")
+            return exported_stl_path
+    except Exception as e:
+        return str(e)
 
 @app.route('/')
 def index():
@@ -167,7 +173,7 @@ def route_make_printable_model():
 
     # using Preform API to do OCP and save the result as an .STL and a .form
     # return the path to the .stl and the .form
-    result = convert_3d_model_to_printable_model(stl_file_path)
+    result = convert_3d_model_to_printable_model(Path(stl_file_path))
     print(f"Printable model result: {result}")
     if isinstance(result, str):
         return jsonify({"message": "Error", "error": result})

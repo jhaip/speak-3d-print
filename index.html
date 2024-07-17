@@ -9,7 +9,10 @@
     <h1>Voice to STL Model</h1>
     <button id="record-btn">Start Recording</button>
     <p id="status"></p>
+    <img id="loading" src="https://c.tenor.com/BbfKJfP43RwAAAAC/tenor.gif" style="display: none;">
     <a id="download-link" href="#" download style="display: none;">Download Model</a>
+    <a id="prepare-print-button" href="#" style="display: none;">Prepare Print</a>
+    
     <div id="renderer-container" style="display: none;"></div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -21,6 +24,7 @@
         let audioChunks = [];
         let recording = false;
         let scene, camera, renderer, loader, controls;
+        let stl_file_path;
 
         window.onload = function () {
             navigator.permissions.query({name: 'microphone'})
@@ -31,6 +35,37 @@
                 console.log('Got error :', error);
             });
         };
+
+        function doMakePrintableModelRequest() {
+            // send request to prepare print
+            document.getElementById('loading').style.display = 'block';
+            const jsonData = {"file_path": stl_file_path};
+            fetch('/make-printable-model', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('status').innerText = data.message;
+                if (data.message.includes('error')) {
+                    return;
+                }
+                document.getElementById('download-link').href = `/download/${data.file_path}`;
+                document.getElementById('download-link').style.display = 'block';
+                document.getElementById('renderer-container').style.display = 'block';
+                playAudio(data.message);
+                renderSTL(`/download/${data.file_path}`);
+            });
+        }
+
+        document.getElementById('prepare-print-button').addEventListener('click', () => {
+            playAudio("Starting to prepare printable model");
+            doMakePrintableModelRequest();
+        });
 
         document.getElementById('record-btn').addEventListener('click', () => {
             if (recording) {
@@ -68,6 +103,8 @@
                                 return;
                             }
 
+                            document.getElementById('loading').style.display = 'block';
+
                             const jsonData = {"prompt": data.text};
                             fetch('/make-model', {
                                 method: 'POST',
@@ -78,15 +115,21 @@
                             })
                             .then(response => response.json())
                             .then(data => {
+                                document.getElementById('loading').style.display = 'none';
                                 document.getElementById('status').innerText = data.message;
                                 if (data.message.includes('error')) {
                                     return;
                                 }
+                                // save the STL file path for the request to make a printable model
+                                stl_file_path = data.file_path;
                                 document.getElementById('download-link').href = `/download/${data.file_path}`;
                                 document.getElementById('download-link').style.display = 'block';
                                 document.getElementById('renderer-container').style.display = 'block';
+                                document.getElementById('prepare-print-button').style.display = 'block';
                                 playAudio(data.message);
                                 renderSTL(`/download/${data.file_path}`);
+
+                                doMakePrintableModelRequest();
                             });
                         });
                     };
@@ -132,6 +175,9 @@
 
         function renderSTL(url) {
             loader.load(url, geometry => {
+                // first clear the scene
+                scene.remove(scene.children[scene.children.length - 1]);
+
                 const material = new THREE.MeshStandardMaterial({ color: 0x606060, roughness: 0.75, metalness: 0.1 });
                 const mesh = new THREE.Mesh(geometry, material);
                 scene.add(mesh);
