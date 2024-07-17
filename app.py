@@ -143,7 +143,7 @@ def index():
     return send_from_directory('.', 'index.html')
 
 @app.route('/record', methods=['POST'])
-def record():
+def route_record():
     audio_file = request.files['audio']
     audio_path = "recording.wav"
     audio_file.save(audio_path)
@@ -153,7 +153,7 @@ def record():
     return jsonify({"text":transcribed_text})
 
 @app.route('/make-model', methods=['POST'])
-def record():
+def route_make_model():
     prompt = request.json['prompt']
     stl_file_path = text_to_3d_model(prompt)
     print(f"STL file path: {stl_file_path}")
@@ -162,7 +162,7 @@ def record():
     return jsonify({"message": "Model is ready", "file_path": stl_file_path.name})
 
 @app.route('/make-printable-model', methods=['POST'])
-def record():
+def route_make_printable_model():
     stl_file_path = request.json['file_path']
 
     # using Preform API to do OCP and save the result as an .STL and a .form

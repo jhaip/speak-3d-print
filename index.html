@@ -64,7 +64,7 @@
                         .then(response => response.json())
                         .then(data => {
                             document.getElementById('status').innerText = data.text;
-                            if (data.message.includes('error')) {
+                            if (data.text.includes('error')) {
                                 return;
                             }
 
