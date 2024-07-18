@@ -103,6 +103,8 @@
                                 return;
                             }
 
+                            playAudio(`Making ${data.text}`);
+
                             document.getElementById('loading').style.display = 'block';
 
                             const jsonData = {"prompt": data.text};
