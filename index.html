@@ -25,41 +25,45 @@
         let recording = false;
         let scene, camera, renderer, loader, controls;
         let stl_file_path;
+        const ZOO_DEV_STL_RENDER_SCALE_ADJUSTMENT = 5;
 
-        window.onload = function () {
-            navigator.permissions.query({name: 'microphone'})
-            .then((permissionObj) => {
+        window.onload = async function () {
+            try {
+                const permissionObj = await navigator.permissions.query({ name: 'microphone' });
                 console.log(permissionObj.state);
-            })
-            .catch((error) => {
-                console.log('Got error :', error);
-            });
+            } catch (error) {
+                console.log('Got error:', error);
+            }
         };
 
-        function doMakePrintableModelRequest() {
-            // send request to prepare print
+        async function doMakePrintableModelRequest() {
             document.getElementById('loading').style.display = 'block';
-            const jsonData = {"file_path": stl_file_path};
-            fetch('/make-printable-model', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(jsonData)
-            })
-            .then(response => response.json())
-            .then(data => {
+            const jsonData = { "file_path": stl_file_path };
+
+            try {
+                const response = await fetch('/make-printable-model', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+                const data = await response.json();
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('status').innerText = data.message;
+
                 if (data.message.includes('error')) {
                     return;
                 }
+
                 document.getElementById('download-link').href = `/download/${data.file_path}`;
                 document.getElementById('download-link').style.display = 'block';
                 document.getElementById('renderer-container').style.display = 'block';
                 playAudio(data.message);
-                renderSTL(`/download/${data.file_path}`);
-            });
+                renderSTL(`/download/${data.file_path}`, 1);
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
 
         document.getElementById('prepare-print-button').addEventListener('click', () => {
@@ -78,73 +82,81 @@
             }
         });
 
-        function startRecording() {
-            console.log("requesting microphone access...")
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(stream => {
-                    console.log("microphone access granted.")
-                    mediaRecorder = new MediaRecorder(stream);
-                    mediaRecorder.ondataavailable = event => {
-                        audioChunks.push(event.data);
-                    };
-                    mediaRecorder.onstop = () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                        const formData = new FormData();
-                        formData.append('audio', audioBlob, 'recording.wav');
-                        
-                        fetch('/record', {
+        async function startRecording() {
+            console.log("Requesting microphone access...");
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                console.log("Microphone access granted.");
+
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const formData = new FormData();
+                    formData.append('audio', audioBlob, 'recording.wav');
+
+                    try {
+                        const response = await fetch('/record', {
                             method: 'POST',
                             body: formData
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            document.getElementById('status').innerText = data.text;
-                            if (data.text.includes('error')) {
-                                return;
-                            }
-
-                            playAudio(`Making ${data.text}`);
-
-                            document.getElementById('loading').style.display = 'block';
-
-                            const jsonData = {"prompt": data.text};
-                            fetch('/make-model', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify(jsonData)
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                document.getElementById('loading').style.display = 'none';
-                                document.getElementById('status').innerText = data.message;
-                                if (data.message.includes('error')) {
-                                    return;
-                                }
-                                // save the STL file path for the request to make a printable model
-                                stl_file_path = data.file_path;
-                                document.getElementById('download-link').href = `/download/${data.file_path}`;
-                                document.getElementById('download-link').style.display = 'block';
-                                document.getElementById('renderer-container').style.display = 'block';
-                                document.getElementById('prepare-print-button').style.display = 'block';
-                                playAudio(data.message);
-                                renderSTL(`/download/${data.file_path}`);
-
-                                doMakePrintableModelRequest();
-                            });
                         });
-                    };
-                    mediaRecorder.start();
-                    document.getElementById('record-btn').innerText = "Stop Recording";
-                    document.getElementById('status').innerText = "Recording...";
-                    audioChunks = [];
-                    recording = true;
-                })
-                .catch(error => {
-                    console.error('Error accessing microphone:', error);
-                    document.getElementById('status').innerText = "Microphone access denied.";
-                });
+                        const data = await response.json();
+                        document.getElementById('status').innerText = data.text;
+
+                        if (data.text.includes('error')) {
+                            return;
+                        }
+
+                        playAudio(`Making ${data.text}`);
+                        document.getElementById('loading').style.display = 'block';
+
+                        const jsonData = { "prompt": data.text };
+                        const makeModelResponse = await fetch('/make-model', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(jsonData)
+                        });
+                        const makeModelData = await makeModelResponse.json();
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('status').innerText = makeModelData.message;
+
+                        if (makeModelData.message.includes('error')) {
+                            return;
+                        }
+
+                        stl_file_path = makeModelData.file_path;
+                        document.getElementById('download-link').href = `/download/${makeModelData.file_path}`;
+                        document.getElementById('download-link').style.display = 'block';
+                        document.getElementById('renderer-container').style.display = 'block';
+                        document.getElementById('prepare-print-button').style.display = 'block';
+                        playAudio(makeModelData.message);
+                        renderSTL(`/download/${makeModelData.file_path}`, ZOO_DEV_STL_RENDER_SCALE_ADJUSTMENT);
+
+                        setTimeout(() => {
+                            playAudio("Now making the model printable.");
+                        }, 1000);
+
+                        doMakePrintableModelRequest();
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                };
+
+                mediaRecorder.start();
+                document.getElementById('record-btn').innerText = "Stop Recording";
+                document.getElementById('status').innerText = "Recording...";
+                audioChunks = [];
+                recording = true;
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                document.getElementById('status').innerText = "Microphone access denied.";
+            }
         }
 
         function playAudio(text) {
@@ -154,11 +166,13 @@
 
         function initThreeJS() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xffffff);
+            scene.background = new THREE.Color(0xf0f0f0);
 
-            camera = new THREE.PerspectiveCamera(50, window.innerWidth / 500, 0.1, 1000);
+            const canvasWidth = 500; // window.innerWidth;
+
+            camera = new THREE.PerspectiveCamera(50, canvasWidth / 500, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, 500);
+            renderer.setSize(canvasWidth, 500);
             document.getElementById('renderer-container').appendChild(renderer.domElement);
 
             const ambientLight = new THREE.AmbientLight(0x404040); // Soft white light
@@ -175,19 +189,24 @@
             controls = new THREE.OrbitControls(camera, renderer.domElement);
         }
 
-        function renderSTL(url) {
+        function renderSTL(url, scale) {
             loader.load(url, geometry => {
                 // first clear the scene
                 scene.remove(scene.children[scene.children.length - 1]);
 
                 const material = new THREE.MeshStandardMaterial({ color: 0x606060, roughness: 0.75, metalness: 0.1 });
                 const mesh = new THREE.Mesh(geometry, material);
+
+                mesh.scale.set(scale, scale, scale);
+
                 scene.add(mesh);
 
                 // Compute the bounding box of the geometry to dynamically adjust the camera
                 const boundingBox = new THREE.Box3().setFromObject(mesh);
                 const center = boundingBox.getCenter(new THREE.Vector3());
                 const size = boundingBox.getSize(new THREE.Vector3());
+
+                mesh.position.copy(center).negate();
 
                 const maxDim = Math.max(size.x, size.y, size.z);
                 const fov = camera.fov * (Math.PI / 180);
@@ -213,6 +232,9 @@
         }
 
         initThreeJS();
+        // document.getElementById('renderer-container').style.display = 'block';
+        // renderSTL('/download/8da3966d-98ce-404a-a5a0-c532b3a15eea.stl', ZOO_DEV_STL_RENDER_SCALE_ADJUSTMENT);
+        // renderSTL('/download/export.stl', 1);
     </script>
 </body>
 </html>
