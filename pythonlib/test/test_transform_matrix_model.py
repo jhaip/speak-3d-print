@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.transform_matrix_model import TransformMatrixModel
+from formlabs.models.transform_matrix_model import TransformMatrixModel
 
 class TestTransformMatrixModel(unittest.TestCase):
     """TransformMatrixModel unit test stubs"""

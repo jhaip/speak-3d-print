@@ -2,7 +2,7 @@
 Handwritten convenience wrapper around the generated Python library code
 """
 from contextlib import contextmanager
-import openapi_client
+import formlabs
 import subprocess
 import os
 import sys
@@ -12,10 +12,10 @@ class PreFormApi:
 
     def __init__(self, preform_port=44388):
         self.preform_port = preform_port
-        self.client = openapi_client.ApiClient(
-            openapi_client.Configuration(host=f"http://localhost:{preform_port}")
+        self.client = formlabs.ApiClient(
+            formlabs.Configuration(host=f"http://localhost:{preform_port}")
         )
-        self.api = openapi_client.DefaultApi(self.client)
+        self.api = formlabs.DefaultApi(self.client)
 
     @staticmethod
     def start_preform_sync(pathToPreformServer=None, preform_port=44388):
@@ -78,3 +78,4 @@ def _find_preform_server(pathToPreformServer=None):
         raise FileNotFoundError("PreFormServer executable not found at " + pathToPreformServer)
 
     return pathToPreformServer
+

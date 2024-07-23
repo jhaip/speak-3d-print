@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.auto_orient_post_request import AutoOrientPostRequest
+from formlabs.models.auto_orient_post_request import AutoOrientPostRequest
 
 class TestAutoOrientPostRequest(unittest.TestCase):
     """AutoOrientPostRequest unit test stubs"""

@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from openapi_client.models.euler_angles_model import EulerAnglesModel
+from formlabs.models.euler_angles_model import EulerAnglesModel
 
 # TODO update the JSON string below
 json = "{}"

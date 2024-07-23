@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.model_properties import ModelProperties
+from formlabs.models.model_properties import ModelProperties
 
 class TestModelProperties(unittest.TestCase):
     """ModelProperties unit test stubs"""
@@ -37,22 +37,22 @@ class TestModelProperties(unittest.TestCase):
             return ModelProperties(
                 id = '',
                 name = '',
-                position = openapi_client.models.scene_position_model.ScenePositionModel(
+                position = formlabs.models.scene_position_model.ScenePositionModel(
                     x = 1.337, 
                     y = 1.337, 
                     z = 1.337, ),
-                orientation = openapi_client.models.euler_angles_model.EulerAnglesModel(
+                orientation = formlabs.models.euler_angles_model.EulerAnglesModel(
                     x = 1.337, 
                     y = 1.337, 
                     z = 1.337, ),
                 scale = 1.337,
                 units = 'MILLIMETERS',
-                bbox = openapi_client.models.model_properties_bbox.ModelProperties_bbox(
-                    min_corner = openapi_client.models.scene_position_model.ScenePositionModel(
+                bbox = formlabs.models.model_properties_bbox.ModelProperties_bbox(
+                    min_corner = formlabs.models.scene_position_model.ScenePositionModel(
                         x = 1.337, 
                         y = 1.337, 
                         z = 1.337, ), 
-                    max_corner = openapi_client.models.scene_position_model.ScenePositionModel(
+                    max_corner = formlabs.models.scene_position_model.ScenePositionModel(
                         x = 1.337, 
                         y = 1.337, 
                         z = 1.337, ), ),

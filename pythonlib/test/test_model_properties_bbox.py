@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.model_properties_bbox import ModelPropertiesBbox
+from formlabs.models.model_properties_bbox import ModelPropertiesBbox
 
 class TestModelPropertiesBbox(unittest.TestCase):
     """ModelPropertiesBbox unit test stubs"""
@@ -35,11 +35,11 @@ class TestModelPropertiesBbox(unittest.TestCase):
         model = ModelPropertiesBbox()
         if include_optional:
             return ModelPropertiesBbox(
-                min_corner = openapi_client.models.scene_position_model.ScenePositionModel(
+                min_corner = formlabs.models.scene_position_model.ScenePositionModel(
                     x = 1.337, 
                     y = 1.337, 
                     z = 1.337, ),
-                max_corner = openapi_client.models.scene_position_model.ScenePositionModel(
+                max_corner = formlabs.models.scene_position_model.ScenePositionModel(
                     x = 1.337, 
                     y = 1.337, 
                     z = 1.337, )

@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.scene_position_model import ScenePositionModel
+from formlabs.models.scene_position_model import ScenePositionModel
 
 class TestScenePositionModel(unittest.TestCase):
     """ScenePositionModel unit test stubs"""

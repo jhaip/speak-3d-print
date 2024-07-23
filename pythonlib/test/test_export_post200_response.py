@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.export_post200_response import ExportPost200Response
+from formlabs.models.export_post200_response import ExportPost200Response
 
 class TestExportPost200Response(unittest.TestCase):
     """ExportPost200Response unit test stubs"""

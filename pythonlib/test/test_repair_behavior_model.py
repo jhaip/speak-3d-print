@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.repair_behavior_model import RepairBehaviorModel
+from formlabs.models.repair_behavior_model import RepairBehaviorModel
 
 class TestRepairBehaviorModel(unittest.TestCase):
     """RepairBehaviorModel unit test stubs"""

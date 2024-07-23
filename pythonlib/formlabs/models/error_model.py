@@ -19,7 +19,7 @@ import json
 
 from pydantic import BaseModel, ConfigDict
 from typing import Any, ClassVar, Dict, List, Optional
-from openapi_client.models.error_model_error import ErrorModelError
+from formlabs.models.error_model_error import ErrorModelError
 from typing import Optional, Set
 from typing_extensions import Self
 

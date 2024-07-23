@@ -19,10 +19,10 @@ import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional, Union
-from openapi_client.models.import_units_model import ImportUnitsModel
-from openapi_client.models.orientation_model import OrientationModel
-from openapi_client.models.repair_behavior_model import RepairBehaviorModel
-from openapi_client.models.scene_position_model import ScenePositionModel
+from formlabs.models.import_units_model import ImportUnitsModel
+from formlabs.models.orientation_model import OrientationModel
+from formlabs.models.repair_behavior_model import RepairBehaviorModel
+from formlabs.models.scene_position_model import ScenePositionModel
 from typing import Optional, Set
 from typing_extensions import Self
 

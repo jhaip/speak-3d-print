@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from openapi_client.models.auto_orient_post_request_models import AutoOrientPostRequestModels
+from formlabs.models.auto_orient_post_request_models import AutoOrientPostRequestModels
 
 # TODO update the JSON string below
 json = "{}"

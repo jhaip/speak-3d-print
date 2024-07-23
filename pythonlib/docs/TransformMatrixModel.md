@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from openapi_client.models.transform_matrix_model import TransformMatrixModel
+from formlabs.models.transform_matrix_model import TransformMatrixModel
 
 # TODO update the JSON string below
 json = "{}"

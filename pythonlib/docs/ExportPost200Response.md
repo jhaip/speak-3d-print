@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from openapi_client.models.export_post200_response import ExportPost200Response
+from formlabs.models.export_post200_response import ExportPost200Response
 
 # TODO update the JSON string below
 json = "{}"

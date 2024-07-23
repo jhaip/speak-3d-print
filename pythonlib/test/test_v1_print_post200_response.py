@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.v1_print_post200_response import V1PrintPost200Response
+from formlabs.models.v1_print_post200_response import V1PrintPost200Response
 
 class TestV1PrintPost200Response(unittest.TestCase):
     """V1PrintPost200Response unit test stubs"""

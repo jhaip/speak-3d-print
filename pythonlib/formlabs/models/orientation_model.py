@@ -17,9 +17,9 @@ import json
 import pprint
 from pydantic import BaseModel, ConfigDict, Field, StrictStr, ValidationError, field_validator
 from typing import Any, List, Optional
-from openapi_client.models.direction_vectors_model import DirectionVectorsModel
-from openapi_client.models.euler_angles_model import EulerAnglesModel
-from openapi_client.models.transform_matrix_model import TransformMatrixModel
+from formlabs.models.direction_vectors_model import DirectionVectorsModel
+from formlabs.models.euler_angles_model import EulerAnglesModel
+from formlabs.models.transform_matrix_model import TransformMatrixModel
 from pydantic import StrictStr, Field
 from typing import Union, List, Set, Optional, Dict
 from typing_extensions import Literal, Self

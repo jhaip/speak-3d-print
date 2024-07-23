@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.scene_post_request import ScenePostRequest
+from formlabs.models.scene_post_request import ScenePostRequest
 
 class TestScenePostRequest(unittest.TestCase):
     """ScenePostRequest unit test stubs"""

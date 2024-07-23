@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.units_model import UnitsModel
+from formlabs.models.units_model import UnitsModel
 
 class TestUnitsModel(unittest.TestCase):
     """UnitsModel unit test stubs"""

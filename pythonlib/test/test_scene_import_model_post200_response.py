@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.scene_import_model_post200_response import SceneImportModelPost200Response
+from formlabs.models.scene_import_model_post200_response import SceneImportModelPost200Response
 
 class TestSceneImportModelPost200Response(unittest.TestCase):
     """SceneImportModelPost200Response unit test stubs"""

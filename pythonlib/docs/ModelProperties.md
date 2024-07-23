@@ -20,7 +20,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from openapi_client.models.model_properties import ModelProperties
+from formlabs.models.model_properties import ModelProperties
 
 # TODO update the JSON string below
 json = "{}"

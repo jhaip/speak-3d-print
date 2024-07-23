@@ -1,12 +1,12 @@
 from pathlib import Path
-import pythonlib.formlabs.formlabs as formlabs
-import openapi_client
-from openapi_client.models.auto_orient_post_request import AutoOrientPostRequest
+import formlabs
+from formlabs.models.auto_orient_post_request import AutoOrientPostRequest
 
 def convert_3d_model_to_printable_model(stl_file_path: Path) -> Path | str:
     print(f"Converting 3D model to printable model...")
-    p = Path.home() / "code/build-PreForm-Desktop_Qt_5_15_2_clang_64bit-Debug/app/PreFormServer/output/PreFormServer.app/Contents/MacOS/PreFormServer"
-    with formlabs.PreFormApi.start_preform_server(pathToPreformServer=p) as preform:
+    p = Path().resolve() / "PreFormServer.app/Contents/MacOS/PreFormServer"
+    print(str(p))
+    with formlabs.PreFormApi.start_preform_server(pathToPreformServer=str(p)) as preform:
         print(f"Creating new scene...")
         preform.api.scene_post({
             "machine_type": "FRMB-3-0",

@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.orientation_model import OrientationModel
+from formlabs.models.orientation_model import OrientationModel
 
 class TestOrientationModel(unittest.TestCase):
     """OrientationModel unit test stubs"""

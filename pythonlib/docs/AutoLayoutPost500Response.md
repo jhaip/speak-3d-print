@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from openapi_client.models.auto_layout_post500_response import AutoLayoutPost500Response
+from formlabs.models.auto_layout_post500_response import AutoLayoutPost500Response
 
 # TODO update the JSON string below
 json = "{}"

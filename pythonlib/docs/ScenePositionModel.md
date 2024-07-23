@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from openapi_client.models.scene_position_model import ScenePositionModel
+from formlabs.models.scene_position_model import ScenePositionModel
 
 # TODO update the JSON string below
 json = "{}"

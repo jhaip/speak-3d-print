@@ -17,19 +17,19 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from pydantic import BaseModel, ConfigDict
 from typing import Any, ClassVar, Dict, List, Optional
+from formlabs.models.scene_position_model import ScenePositionModel
 from typing import Optional, Set
 from typing_extensions import Self
 
-class PrintersPost200ResponsePrintersInner(BaseModel):
+class ModelPropertiesBbox(BaseModel):
     """
-    PrintersPost200ResponsePrintersInner
+    ModelPropertiesBbox
     """ # noqa: E501
-    name: Optional[StrictStr] = Field(default=None, description="Name of the printer")
-    machine_type_id: Optional[StrictStr] = Field(default=None, description="Machine type ID of the printer")
-    ip_address: Optional[StrictStr] = Field(default=None, description="IP address of the printer")
-    __properties: ClassVar[List[str]] = ["name", "machine_type_id", "ip_address"]
+    min_corner: Optional[ScenePositionModel] = None
+    max_corner: Optional[ScenePositionModel] = None
+    __properties: ClassVar[List[str]] = ["min_corner", "max_corner"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -49,7 +49,7 @@ class PrintersPost200ResponsePrintersInner(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of PrintersPost200ResponsePrintersInner from a JSON string"""
+        """Create an instance of ModelPropertiesBbox from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -70,11 +70,17 @@ class PrintersPost200ResponsePrintersInner(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of min_corner
+        if self.min_corner:
+            _dict['min_corner'] = self.min_corner.to_dict()
+        # override the default output from pydantic by calling `to_dict()` of max_corner
+        if self.max_corner:
+            _dict['max_corner'] = self.max_corner.to_dict()
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of PrintersPost200ResponsePrintersInner from a dict"""
+        """Create an instance of ModelPropertiesBbox from a dict"""
         if obj is None:
             return None
 
@@ -82,9 +88,8 @@ class PrintersPost200ResponsePrintersInner(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "name": obj.get("name"),
-            "machine_type_id": obj.get("machine_type_id"),
-            "ip_address": obj.get("ip_address")
+            "min_corner": ScenePositionModel.from_dict(obj["min_corner"]) if obj.get("min_corner") is not None else None,
+            "max_corner": ScenePositionModel.from_dict(obj["max_corner"]) if obj.get("max_corner") is not None else None
         })
         return _obj
 

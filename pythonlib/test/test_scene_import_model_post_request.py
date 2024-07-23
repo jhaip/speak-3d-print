@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.scene_import_model_post_request import SceneImportModelPostRequest
+from formlabs.models.scene_import_model_post_request import SceneImportModelPostRequest
 
 class TestSceneImportModelPostRequest(unittest.TestCase):
     """SceneImportModelPostRequest unit test stubs"""
@@ -38,11 +38,11 @@ class TestSceneImportModelPostRequest(unittest.TestCase):
                 file = '',
                 repair_behavior = 'IGNORE',
                 name = '',
-                position = openapi_client.models.scene_position_model.ScenePositionModel(
+                position = formlabs.models.scene_position_model.ScenePositionModel(
                     x = 1.337, 
                     y = 1.337, 
                     z = 1.337, ),
-                orientation = openapi_client.models.orientation_model.OrientationModel(),
+                orientation = formlabs.models.orientation_model.OrientationModel(),
                 scale = 1.337,
                 units = 'DETECTED'
             )

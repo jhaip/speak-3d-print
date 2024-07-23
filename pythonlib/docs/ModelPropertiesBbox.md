@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from openapi_client.models.model_properties_bbox import ModelPropertiesBbox
+from formlabs.models.model_properties_bbox import ModelPropertiesBbox
 
 # TODO update the JSON string below
 json = "{}"

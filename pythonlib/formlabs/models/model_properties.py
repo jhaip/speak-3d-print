@@ -19,10 +19,10 @@ import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional, Union
-from openapi_client.models.euler_angles_model import EulerAnglesModel
-from openapi_client.models.model_properties_bbox import ModelPropertiesBbox
-from openapi_client.models.scene_position_model import ScenePositionModel
-from openapi_client.models.units_model import UnitsModel
+from formlabs.models.euler_angles_model import EulerAnglesModel
+from formlabs.models.model_properties_bbox import ModelPropertiesBbox
+from formlabs.models.scene_position_model import ScenePositionModel
+from formlabs.models.units_model import UnitsModel
 from typing import Optional, Set
 from typing_extensions import Self
 

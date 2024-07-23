@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.euler_angles_model import EulerAnglesModel
+from formlabs.models.euler_angles_model import EulerAnglesModel
 
 class TestEulerAnglesModel(unittest.TestCase):
     """EulerAnglesModel unit test stubs"""

@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from openapi_client.models.direction_vectors_model import DirectionVectorsModel
+from formlabs.models.direction_vectors_model import DirectionVectorsModel
 
 # TODO update the JSON string below
 json = "{}"

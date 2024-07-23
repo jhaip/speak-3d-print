@@ -1,7 +1,6 @@
 # coding: utf-8
 
 # flake8: noqa
-
 """
     PreForm API
 
@@ -14,23 +13,7 @@
 """  # noqa: E501
 
 
-__version__ = "1.0.0"
-
-# import apis into sdk package
-from formlabs.api.default_api import DefaultApi
-
-# import ApiClient
-from formlabs.api_response import ApiResponse
-from formlabs.api_client import ApiClient
-from formlabs.configuration import Configuration
-from formlabs.exceptions import OpenApiException
-from formlabs.exceptions import ApiTypeError
-from formlabs.exceptions import ApiValueError
-from formlabs.exceptions import ApiKeyError
-from formlabs.exceptions import ApiAttributeError
-from formlabs.exceptions import ApiException
-
-# import models into sdk package
+# import models into model package
 from formlabs.models.auto_layout_post500_response import AutoLayoutPost500Response
 from formlabs.models.auto_orient_post_request import AutoOrientPostRequest
 from formlabs.models.auto_orient_post_request_models import AutoOrientPostRequestModels
@@ -51,6 +34,3 @@ from formlabs.models.scene_post_request import ScenePostRequest
 from formlabs.models.transform_matrix_model import TransformMatrixModel
 from formlabs.models.units_model import UnitsModel
 from formlabs.models.v1_print_post200_response import V1PrintPost200Response
-
-# START SECTION OF CODE ADDED BY FORMLABS
-from formlabs.PreFormApi import PreFormApi

@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.auto_layout_post500_response import AutoLayoutPost500Response
+from formlabs.models.auto_layout_post500_response import AutoLayoutPost500Response
 
 class TestAutoLayoutPost500Response(unittest.TestCase):
     """AutoLayoutPost500Response unit test stubs"""

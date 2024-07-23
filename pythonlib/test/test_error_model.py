@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.error_model import ErrorModel
+from formlabs.models.error_model import ErrorModel
 
 class TestErrorModel(unittest.TestCase):
     """ErrorModel unit test stubs"""
@@ -35,7 +35,7 @@ class TestErrorModel(unittest.TestCase):
         model = ErrorModel()
         if include_optional:
             return ErrorModel(
-                error = openapi_client.models.error_model_error.ErrorModel_error(
+                error = formlabs.models.error_model_error.ErrorModel_error(
                     code = '', 
                     message = '', )
             )

@@ -14,7 +14,7 @@
 
 import unittest
 
-from openapi_client.models.direction_vectors_model import DirectionVectorsModel
+from formlabs.models.direction_vectors_model import DirectionVectorsModel
 
 class TestDirectionVectorsModel(unittest.TestCase):
     """DirectionVectorsModel unit test stubs"""
